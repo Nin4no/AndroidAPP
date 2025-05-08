@@ -25,21 +25,21 @@ import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
     static int index_layout = 0;
 
     LinearLayout start_layout, inGame_layout, setting_layout, end_layout;
     FrameLayout inGame_play_layout;
-    private MediaPlayer mp1;
-    private boolean isMuted = false;
-
+    TextView Timer, scoreTextView, finalScoreTextView;
     CountDownTimer countDownTimer;
+    int score = 0;
 
-    TextView Timer;
-
-    MyPointView myPointView;
     GridLayout game_field;
     List<Pair<mandarin, View>> mandarinViews = new ArrayList<>();
+    MyPointView myPointView;
+    Random random = new Random();
+
+    private MediaPlayer mp1;
+    private boolean isMuted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,185 +51,183 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        
+        Timer              = findViewById(R.id.TimeDisplay);
+        scoreTextView      = findViewById(R.id.ScoreDisplay);
+        finalScoreTextView = findViewById(R.id.FinalScoreDisplay);
 
-        Button btn_start = findViewById(R.id.btn_Start);
-        Button btn_ingame_setting = findViewById(R.id.btn_InGame_Setting);
-        Button btn_settingpage_back = findViewById(R.id.btn_SettingPage_Back);
-        Button btn_settingpage_title = findViewById(R.id.btn_SettingPage_Title);
-        Button btn_endpage_again = findViewById(R.id.btn_EndPage_Again);
-        Button btn_endpage_title = findViewById(R.id.btn_EndPage_Title);
+        Button btn_start               = findViewById(R.id.btn_Start);
+        Button btn_ingame_setting      = findViewById(R.id.btn_InGame_Setting);
+        Button btn_settingpage_back    = findViewById(R.id.btn_SettingPage_Back);
         Button btn_settingpage_restart = findViewById(R.id.btn_SettingPage_Restart);
-        start_layout = findViewById(R.id.layout_First_Page);
-        inGame_layout = findViewById(R.id.layout_InGame);
-        inGame_play_layout = findViewById(R.id.inGame_play);
-        setting_layout = findViewById(R.id.layout_SettingPage);
-        end_layout = findViewById(R.id.layout_EndPage);
-        CheckBox chk1 = findViewById(R.id.Mute);
-        SeekBar volumebar = findViewById(R.id.VolumeControl);
+        Button btn_settingpage_title   = findViewById(R.id.btn_SettingPage_Title);
+        Button btn_endpage_again       = findViewById(R.id.btn_EndPage_Again);
+        Button btn_endpage_title       = findViewById(R.id.btn_EndPage_Title);
+
+        start_layout      = findViewById(R.id.layout_First_Page);
+        inGame_layout     = findViewById(R.id.layout_InGame);
+        setting_layout    = findViewById(R.id.layout_SettingPage);
+        end_layout        = findViewById(R.id.layout_EndPage);
+        inGame_play_layout= findViewById(R.id.inGame_play);
+        game_field        = findViewById(R.id.inGame_field);
+
+        
         mp1 = MediaPlayer.create(this, R.raw.stikato);
-        game_field = findViewById(R.id.inGame_field);
-        Random random = new Random();
-
-
-        List<Pair<mandarin, View>> tempMandarinViews = new ArrayList<>();
-        for (int i = 0; i < 98; i++) {
-            int num = random.nextInt(9) + 1;
-            mandarin block = new mandarin(this, num);
-
-            int row = i / 7;
-            int col = i % 7;
-            GridLayout.Spec rowSpec = GridLayout.spec(row, 1);
-            GridLayout.Spec colSpec = GridLayout.spec(col, 1);
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
-            params.width = 150;    // 필요시 dp → px 변환 사용
-            params.height = 150;
-            params.setMargins(10, 10, 10, 10);
-
-            game_field.addView(block, params);
-            tempMandarinViews.add(new Pair<>(block, block));
-        }
-        mandarinViews = tempMandarinViews;
-
-        myPointView = new MyPointView(this, game_field, mandarinViews);
-        FrameLayout.LayoutParams overlayParams = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-        );
-        myPointView.setLayoutParams(overlayParams);
-        inGame_play_layout.addView(myPointView);
-
-        mp1.start();
         mp1.setLooping(true);
         mp1.setVolume(0.5f, 0.5f);
 
-        Timer = findViewById(R.id.TimeDisplay);
+        CheckBox chkMute = findViewById(R.id.Mute);
+        SeekBar volumeBar = findViewById(R.id.VolumeControl);
+        chkMute.setOnCheckedChangeListener((b, checked) -> {
+            isMuted = checked;
+            mp1.setVolume(checked? 0f : 0.5f, checked? 0f : 0.5f);
+        });
+        volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar s, int p, boolean u) {
+                float vol = p / 100f;
+                mp1.setVolume(isMuted? 0f : vol, isMuted? 0f : vol);
+            }
+            @Override public void onStartTrackingTouch(SeekBar s) {}
+            @Override public void onStopTrackingTouch(SeekBar s) {}
+        });
 
-        // 버튼 클릭 리스너
+        
+        myPointView = new MyPointView(this, game_field, mandarinViews);
+        inGame_play_layout.addView(myPointView);
+
+        
+        updateScoreDisplay();
+        finalScoreTextView.setText(String.valueOf(score));
+        change_layout();
+
+        
         btn_start.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "게임을 시작합니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "게임을 시작합니다.", Toast.LENGTH_SHORT).show();
+            resetGame();
+            index_layout = 1;
             change_layout();
             startTimer();
+            mp1.start();
         });
 
         btn_ingame_setting.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "설정으로 이동합니다.", Toast.LENGTH_SHORT).show();
-            change_layout();
-        });
-        btn_settingpage_back.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "게임으로 이동합니다.", Toast.LENGTH_SHORT).show();
-            change_layout();
-        });
-        btn_settingpage_title.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "타이틀로 이동합니다.", Toast.LENGTH_SHORT).show();
-            title_layout();
-        });
-        chk1.setOnClickListener(v -> {
-            if (chk1.isChecked()) {
-                volumebar.setProgress(0);
-            } else {
-                volumebar.setProgress(50);
-            }
-        });
-        btn_endpage_again.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "게임을 재시작합니다.", Toast.LENGTH_SHORT).show();
-            change_layout();
-            startTimer();
-        });
-        btn_endpage_title.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "타이틀로 이동합니다.", Toast.LENGTH_SHORT).show();
-            title_layout();
-        });
-        btn_settingpage_restart.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "게임을 재시작합니다.", Toast.LENGTH_SHORT).show();
-            change_layout();
-            startTimer();
-        });
-
-
-        volumebar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser && progress != 0) {
-                    chk1.setChecked(false);
-                }
-                float volume = progress / 100f;
-
-                mp1.setVolume(volume, volume);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        change_layout();
-        if (mp1 != null && mp1.isPlaying()) {
-            mp1.pause();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mp1 != null && !mp1.isPlaying() && !isMuted) {
-            mp1.start();
-        }
-    }
-
-    public void change_layout() {
-        if (index_layout == 0) {
-            start_layout.setVisibility(View.INVISIBLE);
-            inGame_layout.setVisibility(View.VISIBLE);
-            index_layout = 1;
-        } else if (index_layout == 1) {
-            setting_layout.setVisibility(View.VISIBLE);
+        
             index_layout = 2;
-        } else if (index_layout == 2) {
-            setting_layout.setVisibility(View.INVISIBLE);
+            change_layout();
+        });
+
+        btn_settingpage_back.setOnClickListener(v -> {
+        
             index_layout = 1;
-        } else if (index_layout == 3) {
-            end_layout.setVisibility(View.VISIBLE);
-            setting_layout.setVisibility(View.INVISIBLE);
-            index_layout = 4;
-        } else if (index_layout == 4) {
-            end_layout.setVisibility(View.INVISIBLE);
+            change_layout();
+        });
+
+        btn_settingpage_restart.setOnClickListener(v -> {
+        
+            resetGame();
             index_layout = 1;
-        }
+            change_layout();
+            startTimer();
+        });
+
+        btn_settingpage_title.setOnClickListener(v -> {
+        
+            title_layout();
+        });
+
+        btn_endpage_again.setOnClickListener(v -> {
+        
+            resetGame();
+            index_layout = 1;
+            change_layout();
+            startTimer();
+        });
+
+        btn_endpage_title.setOnClickListener(v -> {
+        
+            title_layout();
+        });
     }
 
-    public void title_layout() {
-        setting_layout.setVisibility(View.INVISIBLE);
-        inGame_layout.setVisibility(View.INVISIBLE);
-        end_layout.setVisibility(View.INVISIBLE);
-        start_layout.setVisibility(View.VISIBLE);
-        index_layout = 0;
+    
+    private void updateScoreDisplay() {
+        scoreTextView.setText("Score: " + score);
     }
 
+    
+    public void addScore(int count) {
+        score += count;
+        updateScoreDisplay();
+    }
+
+    
     public void startTimer() {
-        if (countDownTimer != null){
+    
+        score = 0;
+        updateScoreDisplay();
+        finalScoreTextView.setText("0");
+
+        if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-
-         countDownTimer = new CountDownTimer(60000, 1000) {
+        countDownTimer = new CountDownTimer(60_000, 1_000) {
             public void onTick(long millisUntilFinished) {
-                int min = (int) (millisUntilFinished / 60000);
-                int sec = (int) ((millisUntilFinished % 60000) / 1000);
-                String time = String.format("%d:%02d", min, sec);
-                Timer.setText(time);
+                int min = (int) (millisUntilFinished / 60_000);
+                int sec = (int) ((millisUntilFinished % 60_000) / 1_000);
+                Timer.setText(String.format("%d:%02d", min, sec));
             }
 
             public void onFinish() {
+    
+                finalScoreTextView.setText(String.valueOf(score));
                 index_layout = 3;
                 change_layout();
             }
         }.start();
+    }
+
+    
+    private void change_layout() {
+        start_layout.setVisibility(index_layout == 0 ? View.VISIBLE : View.INVISIBLE);
+        inGame_layout .setVisibility(index_layout == 1 ? View.VISIBLE : View.INVISIBLE);
+        setting_layout .setVisibility(index_layout == 2 ? View.VISIBLE : View.INVISIBLE);
+        end_layout     .setVisibility(index_layout == 3 ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    
+    private void title_layout() {
+        if (countDownTimer != null) countDownTimer.cancel();
+        mp1.pause();
+        index_layout = 0;
+        change_layout();
+    }
+
+    
+    private void resetGame() {
+    
+        if (countDownTimer != null) countDownTimer.cancel();
+
+    
+        score = 0;
+        updateScoreDisplay();
+
+    
+        game_field.removeAllViews();
+        mandarinViews.clear();
+
+    
+        for (int i = 0; i < 98; i++) {
+            int num = random.nextInt(9) + 1;
+            mandarin block = new mandarin(this, num);
+            int row = i / 7, col = i % 7;
+            GridLayout.Spec rowSpec = GridLayout.spec(row, 1);
+            GridLayout.Spec colSpec = GridLayout.spec(col, 1);
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
+            params.width = 150;
+            params.height = 150;
+            params.setMargins(10, 10, 10, 10);
+            game_field.addView(block, params);
+            mandarinViews.add(new Pair<>(block, block));
+        }
     }
 }
