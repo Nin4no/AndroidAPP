@@ -1,13 +1,14 @@
-package com.example.test3;
+package com.example.test4;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.GridLayout;
-import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +27,12 @@ public class MyPointView extends View {
         paint.setAntiAlias(true);
         paint.setStrokeWidth(5);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(android.graphics.Color.BLACK);
+        paint.setColor(Color.BLACK);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (MainActivity.index_layout != 1) return false;
+        if (!MainActivity.Gaming) return false;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 startX = (int) event.getX();
@@ -67,7 +68,6 @@ public class MyPointView extends View {
                         }
                     }
                     if (sum == 10) {
-                        ((MainActivity) getContext()).addScore(toRemove.size());
                         for (Pair<mandarin, View> pairToRemove : toRemove) {
                             gameField.removeView(pairToRemove.second);
                             mandarinViews.remove(pairToRemove);
