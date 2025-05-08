@@ -1,0 +1,235 @@
+package com.example.test3;
+
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.util.Pair;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.FrameLayout;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+
+    static int index_layout = 0;
+
+    LinearLayout start_layout, inGame_layout, setting_layout, end_layout;
+    FrameLayout inGame_play_layout;
+    private MediaPlayer mp1;
+    private boolean isMuted = false;
+
+    CountDownTimer countDownTimer;
+
+    TextView Timer;
+
+    MyPointView myPointView;
+    GridLayout game_field;
+    List<Pair<mandarin, View>> mandarinViews = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        Button btn_start = findViewById(R.id.btn_Start);
+        Button btn_ingame_setting = findViewById(R.id.btn_InGame_Setting);
+        Button btn_settingpage_back = findViewById(R.id.btn_SettingPage_Back);
+        Button btn_settingpage_title = findViewById(R.id.btn_SettingPage_Title);
+        Button btn_endpage_again = findViewById(R.id.btn_EndPage_Again);
+        Button btn_endpage_title = findViewById(R.id.btn_EndPage_Title);
+        Button btn_settingpage_restart = findViewById(R.id.btn_SettingPage_Restart);
+        start_layout = findViewById(R.id.layout_First_Page);
+        inGame_layout = findViewById(R.id.layout_InGame);
+        inGame_play_layout = findViewById(R.id.inGame_play);
+        setting_layout = findViewById(R.id.layout_SettingPage);
+        end_layout = findViewById(R.id.layout_EndPage);
+        CheckBox chk1 = findViewById(R.id.Mute);
+        SeekBar volumebar = findViewById(R.id.VolumeControl);
+        mp1 = MediaPlayer.create(this, R.raw.stikato);
+        game_field = findViewById(R.id.inGame_field);
+        Random random = new Random();
+
+
+        List<Pair<mandarin, View>> tempMandarinViews = new ArrayList<>();
+        for (int i = 0; i < 98; i++) {
+            int num = random.nextInt(9) + 1;
+            mandarin block = new mandarin(this, num);
+
+            int row = i / 7;
+            int col = i % 7;
+            GridLayout.Spec rowSpec = GridLayout.spec(row, 1);
+            GridLayout.Spec colSpec = GridLayout.spec(col, 1);
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
+            params.width = 150;    // 필요시 dp → px 변환 사용
+            params.height = 150;
+            params.setMargins(10, 10, 10, 10);
+
+            game_field.addView(block, params);
+            tempMandarinViews.add(new Pair<>(block, block));
+        }
+        mandarinViews = tempMandarinViews;
+
+        myPointView = new MyPointView(this, game_field, mandarinViews);
+        FrameLayout.LayoutParams overlayParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        myPointView.setLayoutParams(overlayParams);
+        inGame_play_layout.addView(myPointView);
+
+        mp1.start();
+        mp1.setLooping(true);
+        mp1.setVolume(0.5f, 0.5f);
+
+        Timer = findViewById(R.id.TimeDisplay);
+
+        // 버튼 클릭 리스너
+        btn_start.setOnClickListener(v -> {
+            Toast.makeText(getApplicationContext(), "게임을 시작합니다.", Toast.LENGTH_SHORT).show();
+            change_layout();
+            startTimer();
+        });
+
+        btn_ingame_setting.setOnClickListener(v -> {
+            Toast.makeText(getApplicationContext(), "설정으로 이동합니다.", Toast.LENGTH_SHORT).show();
+            change_layout();
+        });
+        btn_settingpage_back.setOnClickListener(v -> {
+            Toast.makeText(getApplicationContext(), "게임으로 이동합니다.", Toast.LENGTH_SHORT).show();
+            change_layout();
+        });
+        btn_settingpage_title.setOnClickListener(v -> {
+            Toast.makeText(getApplicationContext(), "타이틀로 이동합니다.", Toast.LENGTH_SHORT).show();
+            title_layout();
+        });
+        chk1.setOnClickListener(v -> {
+            if (chk1.isChecked()) {
+                volumebar.setProgress(0);
+            } else {
+                volumebar.setProgress(50);
+            }
+        });
+        btn_endpage_again.setOnClickListener(v -> {
+            Toast.makeText(getApplicationContext(), "게임을 재시작합니다.", Toast.LENGTH_SHORT).show();
+            change_layout();
+            startTimer();
+        });
+        btn_endpage_title.setOnClickListener(v -> {
+            Toast.makeText(getApplicationContext(), "타이틀로 이동합니다.", Toast.LENGTH_SHORT).show();
+            title_layout();
+        });
+        btn_settingpage_restart.setOnClickListener(v -> {
+            Toast.makeText(getApplicationContext(), "게임을 재시작합니다.", Toast.LENGTH_SHORT).show();
+            change_layout();
+            startTimer();
+        });
+
+
+        volumebar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && progress != 0) {
+                    chk1.setChecked(false);
+                }
+                float volume = progress / 100f;
+
+                mp1.setVolume(volume, volume);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        change_layout();
+        if (mp1 != null && mp1.isPlaying()) {
+            mp1.pause();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mp1 != null && !mp1.isPlaying() && !isMuted) {
+            mp1.start();
+        }
+    }
+
+    public void change_layout() {
+        if (index_layout == 0) {
+            start_layout.setVisibility(View.INVISIBLE);
+            inGame_layout.setVisibility(View.VISIBLE);
+            index_layout = 1;
+        } else if (index_layout == 1) {
+            setting_layout.setVisibility(View.VISIBLE);
+            index_layout = 2;
+        } else if (index_layout == 2) {
+            setting_layout.setVisibility(View.INVISIBLE);
+            index_layout = 1;
+        } else if (index_layout == 3) {
+            end_layout.setVisibility(View.VISIBLE);
+            setting_layout.setVisibility(View.INVISIBLE);
+            index_layout = 4;
+        } else if (index_layout == 4) {
+            end_layout.setVisibility(View.INVISIBLE);
+            index_layout = 1;
+        }
+    }
+
+    public void title_layout() {
+        setting_layout.setVisibility(View.INVISIBLE);
+        inGame_layout.setVisibility(View.INVISIBLE);
+        end_layout.setVisibility(View.INVISIBLE);
+        start_layout.setVisibility(View.VISIBLE);
+        index_layout = 0;
+    }
+
+    public void startTimer() {
+        if (countDownTimer != null){
+            countDownTimer.cancel();
+        }
+
+         countDownTimer = new CountDownTimer(60000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                int min = (int) (millisUntilFinished / 60000);
+                int sec = (int) ((millisUntilFinished % 60000) / 1000);
+                String time = String.format("%d:%02d", min, sec);
+                Timer.setText(time);
+            }
+
+            public void onFinish() {
+                index_layout = 3;
+                change_layout();
+            }
+        }.start();
+    }
+}
