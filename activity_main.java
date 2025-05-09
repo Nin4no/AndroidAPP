@@ -13,15 +13,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:visibility="visible"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Korean Culture Roblox"
-            android:textSize="30sp"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:text="제주 감귤 게임"
+            android:textSize="30sp" />
 
         <Button
             android:id="@+id/btn_Start"
@@ -82,7 +82,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:columnCount="7"
-                android:rowCount="14" />
+                android:rowCount="14"
+                android:padding="10dp"
+                />
         </FrameLayout>
     </LinearLayout>
 
@@ -91,16 +93,17 @@
         android:id="@+id/layout_SettingPage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"
+        android:background="#80FFFFFF"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="20dp"
+        android:visibility="invisible">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:text="Settings"
-            android:textSize="20sp"
-            android:layout_marginBottom="10dp" />
+            android:textSize="20sp" />
 
         <CheckBox
             android:id="@+id/Mute"
@@ -118,22 +121,22 @@
             android:id="@+id/btn_SettingPage_Back"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Back"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:text="Back" />
 
         <Button
             android:id="@+id/btn_SettingPage_Restart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Restart"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:text="Restart" />
 
         <Button
             android:id="@+id/btn_SettingPage_Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Title"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:text="Title" />
     </LinearLayout>
 
     <!-- End Page -->
