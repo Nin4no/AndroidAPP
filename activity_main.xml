@@ -8,12 +8,12 @@
     android:background="#FFEE96">
 
     <LinearLayout
+        android:id="@+id/layout_First_Page"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:id="@+id/layout_First_Page"
-        android:visibility="visible"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="invisible">
 
         <Button
             android:id="@+id/btn_Start"
@@ -74,68 +74,69 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_SettingPage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:id="@+id/layout_SettingPage"
-        android:visibility="invisible"
         android:background="#99ffffff"
-        android:orientation="vertical"
         android:clickable="true"
-        android:focusable="true">
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="110dp"
-                android:textSize="30dp"
-                android:text="Volume"/>
+                android:text="Volume"
+                android:textSize="30dp" />
+
             <CheckBox
+                android:id="@+id/Mute"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="120dp"
-                android:id="@+id/Mute"
                 android:text="Mute"
-                android:textSize="20dp"
-                />
+                android:textSize="20dp" />
+
             <SeekBar
+                android:id="@+id/VolumeControl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/VolumeControl"
-                android:max="100"
-                android:progress="50"
-                android:layout_marginBottom="30dp"
                 android:layout_marginHorizontal="100dp"
-                />
+                android:layout_marginBottom="30dp"
+                android:max="100"
+                android:progress="50" />
         </LinearLayout>
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/btn_SettingPage_Back"
-            android:backgroundTint="#F15F5F"
-            android:layout_marginHorizontal="120dp"
-            android:text="Back"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="120dp"
+            android:backgroundTint="#F15F5F"
+            android:text="Back" />
+
+        <Button
             android:id="@+id/btn_SettingPage_Restart"
-            android:backgroundTint="#F15F5F"
-            android:layout_marginHorizontal="120dp"
-            android:text="Restart"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_SettingPage_Title"
-            android:backgroundTint="#F15F5F"
             android:layout_marginHorizontal="120dp"
-            android:text="Title"
-            />
+            android:backgroundTint="#F15F5F"
+            android:text="Restart" />
+
+        <Button
+            android:id="@+id/btn_SettingPage_Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="120dp"
+            android:backgroundTint="#F15F5F"
+            android:text="Title" />
     </LinearLayout>
 
     <LinearLayout
