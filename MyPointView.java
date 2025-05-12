@@ -1,4 +1,4 @@
-package com.example.test3;
+package com.example.test4;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -32,7 +32,7 @@ public class MyPointView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (MainActivity.index_layout != 1) return false;
+        if (!MainActivity.Gaming) return false;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 startX = (int) event.getX();

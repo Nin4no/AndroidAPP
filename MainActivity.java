@@ -1,5 +1,6 @@
-package com.example.test3;
+package com.example.test4;
 
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -25,9 +26,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
-    static int index_layout = 0;
-
+    
     LinearLayout start_layout, inGame_layout, setting_layout, end_layout;
     FrameLayout inGame_play_layout;
     private MediaPlayer mp1;
@@ -35,10 +34,14 @@ public class MainActivity extends AppCompatActivity {
 
     CountDownTimer countDownTimer;
     private boolean timerRunning = false;
+    private long timeLeftInMillis;
+    private boolean isFirstResume = true;
     TextView Timer;
 
     MyPointView myPointView;
     GridLayout game_field;
+    static boolean Gaming = false;
+
     List<Pair<mandarin, View>> mandarinViews = new ArrayList<>();
 
     @Override
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         //기능버튼
         Button btn_start = findViewById(R.id.btn_Start);
         Button btn_ingame_setting = findViewById(R.id.btn_InGame_Setting);
@@ -59,16 +63,22 @@ public class MainActivity extends AppCompatActivity {
         Button btn_endpage_again = findViewById(R.id.btn_EndPage_Again);
         Button btn_endpage_title = findViewById(R.id.btn_EndPage_Title);
         Button btn_settingpage_restart = findViewById(R.id.btn_SettingPage_Restart);
+
         //레이아웃
         start_layout = findViewById(R.id.layout_First_Page);
         inGame_layout = findViewById(R.id.layout_InGame);
         inGame_play_layout = findViewById(R.id.inGame_play);
         setting_layout = findViewById(R.id.layout_SettingPage);
         end_layout = findViewById(R.id.layout_EndPage);
+
         //배경음악
         CheckBox chk1 = findViewById(R.id.Mute);
         SeekBar volumebar = findViewById(R.id.VolumeControl);
         mp1 = MediaPlayer.create(this, R.raw.stikato);
+
+        //기본 화면으로
+        change_layout(5);
+
         //인게임 객체
         game_field = findViewById(R.id.inGame_field);
         Random random = new Random();
@@ -111,37 +121,40 @@ public class MainActivity extends AppCompatActivity {
         // 버튼 클릭 리스너
         btn_start.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "게임을 시작합니다.", Toast.LENGTH_SHORT).show();
-            change_layout();
+            change_layout(0);
             startTimer();
         });
 
         btn_ingame_setting.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "설정으로 이동합니다.", Toast.LENGTH_SHORT).show();
-            change_layout();
+            change_layout(1);
+            pauseTimer();
         });
         btn_settingpage_back.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "게임으로 이동합니다.", Toast.LENGTH_SHORT).show();
-            change_layout();
+            change_layout(2);
+            resumeTimer();
+        });
+        btn_settingpage_restart.setOnClickListener(v -> {
+            Toast.makeText(getApplicationContext(), "게임을 재시작합니다.", Toast.LENGTH_SHORT).show();
+            change_layout(2);
+            startTimer();
         });
         btn_settingpage_title.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "타이틀로 이동합니다.", Toast.LENGTH_SHORT).show();
-            title_layout();
+            change_layout(5);
         });
         btn_endpage_again.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "게임을 재시작합니다.", Toast.LENGTH_SHORT).show();
-            change_layout();
+            change_layout(4);
             startTimer();
         });
         btn_endpage_title.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "타이틀로 이동합니다.", Toast.LENGTH_SHORT).show();
-            title_layout();
-        });
-        btn_settingpage_restart.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "게임을 재시작합니다.", Toast.LENGTH_SHORT).show();
-            change_layout();
-            startTimer();
+            change_layout(5);
         });
 
+        //Mute버튼체크 확인
         chk1.setOnClickListener(v -> {
             if (chk1.isChecked()) {
                 volumebar.setProgress(0);
@@ -149,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 volumebar.setProgress(50);
             }
         });
-
+        //볼륨바
         volumebar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -171,63 +184,69 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //백그라운드로 넘어갔을때
     @Override
     protected void onPause() {
         super.onPause();
-        change_layout();
         pauseTimer();
         if (mp1 != null && mp1.isPlaying()) {
             mp1.pause();
         }
     }
 
+    //메인으로 돌아올때
     @Override
     protected void onResume() {
         super.onResume();
-        if (index_layout == 1) {
+        if (!timerRunning && !isFirstResume){
             resumeTimer();
         }
         if (mp1 != null && !mp1.isPlaying() && !isMuted) {
             mp1.start();
         }
+        isFirstResume = false;
     }
 
-    public void change_layout() {
-        if (index_layout == 0) {
+    //화면 바꿀때
+    public void change_layout(int i) {
+        int Layout_Index = i;
+
+        if (Layout_Index == 0) {
             start_layout.setVisibility(View.INVISIBLE);
             inGame_layout.setVisibility(View.VISIBLE);
-            index_layout = 1;
-        } else if (index_layout == 1) {
+            Gaming = true;
+        } else if (Layout_Index == 1) {
             setting_layout.setVisibility(View.VISIBLE);
-            index_layout = 2;
-        } else if (index_layout == 2) {
+            Gaming = false;
+        } else if (Layout_Index == 2) {
             setting_layout.setVisibility(View.INVISIBLE);
-            index_layout = 1;
-        } else if (index_layout == 3) {
+            Gaming = true;
+        } else if (Layout_Index == 3) {
             end_layout.setVisibility(View.VISIBLE);
             setting_layout.setVisibility(View.INVISIBLE);
-            index_layout = 4;
-        } else if (index_layout == 4) {
+            Gaming = false;
+        } else if (Layout_Index == 4) {
             end_layout.setVisibility(View.INVISIBLE);
-            index_layout = 1;
+            Gaming = true;
+        } else if (Layout_Index == 5) {
+            end_layout.setVisibility(View.INVISIBLE);
+            setting_layout.setVisibility(View.INVISIBLE);
+            inGame_layout.setVisibility(View.INVISIBLE);
+            start_layout.setVisibility(View.VISIBLE);
+            Gaming = false;
         }
+
     }
 
-    public void title_layout() {
-        setting_layout.setVisibility(View.INVISIBLE);
-        inGame_layout.setVisibility(View.INVISIBLE);
-        end_layout.setVisibility(View.INVISIBLE);
-        start_layout.setVisibility(View.VISIBLE);
-        index_layout = 0;
-    }
-
+    //타이머
     public void startTimer() {
         if (countDownTimer != null){
             countDownTimer.cancel();
         }
 
-         countDownTimer = new CountDownTimer(60000, 1000) {
+        countDownTimer = new CountDownTimer(60000, 1000) {
             public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
                 int min = (int) (millisUntilFinished / 60000);
                 int sec = (int) ((millisUntilFinished % 60000) / 1000);
                 String time = String.format("%d:%02d", min, sec);
@@ -235,8 +254,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onFinish() {
-                index_layout = 3;
-                change_layout();
+                timerRunning = false;
+                change_layout(3);
             }
         }.start();
         timerRunning = true;
@@ -250,7 +269,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void resumeTimer() {
         if (!timerRunning) {
-            startTimer();
+            countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+                public void onTick(long millisUntilFinished) {
+                    timeLeftInMillis = millisUntilFinished;
+                    int min = (int) (millisUntilFinished / 60000);
+                    int sec = (int) ((millisUntilFinished % 60000) / 1000);
+                    String time = String.format("%d:%02d", min, sec);
+                    Timer.setText(time);
+                }
+
+                public void onFinish() {
+                    timerRunning = false;
+                    change_layout(3);
+                }
+            }.start();
+            timerRunning = true;
         }
     }
+
 }
