@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout start_layout, inGame_layout, setting_layout, end_layout;
     FrameLayout inGame_play_layout;
     private MediaPlayer mp1;
-    private boolean isMuted = false;
+    //private boolean isMuted = false;
 
     CountDownTimer countDownTimer;
     private boolean timerRunning = false;
@@ -158,8 +158,10 @@ public class MainActivity extends AppCompatActivity {
         chk1.setOnClickListener(v -> {
             if (chk1.isChecked()) {
                 volumebar.setProgress(0);
+                //isMuted = true;
             } else {
                 volumebar.setProgress(50);
+               // isMuted = false;
             }
         });
         //볼륨바
@@ -198,10 +200,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!timerRunning && !isFirstResume){
+        if (!timerRunning && !isFirstResume && Gaming){
             resumeTimer();
         }
-        if (mp1 != null && !mp1.isPlaying() && !isMuted) {
+        if (mp1 != null && !mp1.isPlaying() /*&& !isMuted*/) {
             mp1.start();
         }
         isFirstResume = false;
@@ -286,5 +288,4 @@ public class MainActivity extends AppCompatActivity {
             timerRunning = true;
         }
     }
-
 }
