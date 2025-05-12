@@ -1,4 +1,4 @@
-package com.example.test3;
+package com.example.test_score;
 
 import android.content.Context;
 import android.graphics.Color;

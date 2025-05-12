@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             restartGame();
         });
 
-        btn_ingame_setting.setOnClickListener(v -> {
+            btn_ingame_setting.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "설정으로 이동합니다.", Toast.LENGTH_SHORT).show();
             change_layout(1);
             pauseTimer();
