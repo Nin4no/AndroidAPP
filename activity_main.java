@@ -38,36 +38,61 @@
         android:visibility="invisible"
         android:orientation="vertical">
 
-        <!-- Timer and Score Bar -->
+        <!-- Timer Bar + Info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end"
+            android:orientation="vertical"
             android:background="#AAFFA3">
 
-            <TextView
-                android:id="@+id/TimeDisplay"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="10dp"
-                android:textSize="15sp" />
+            <!-- 타이머바 -->
+            <LinearLayout
+                android:id="@+id/TimerBarContainer"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="#AAFFA3"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp">
 
-            <TextView
-                android:id="@+id/ScoreDisplay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:textSize="15sp"
-                android:text="Score: 0" />
+                <View
+                    android:id="@+id/TimerBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#FF8000"/>
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_InGame_Setting"
-                android:layout_width="wrap_content"
+            <!-- 타이머 텍스트 및 점수 -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:text="setting" />
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <TextView
+                    android:id="@+id/TimeDisplay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:textSize="15sp"
+                    android:text="00:30" />
+
+                <TextView
+                    android:id="@+id/ScoreDisplay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:textSize="15sp"
+                    android:text="Score: 0" />
+
+                <Button
+                    android:id="@+id/btn_InGame_Setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:text="setting" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Game Field -->
@@ -83,8 +108,7 @@
                 android:layout_height="match_parent"
                 android:columnCount="7"
                 android:rowCount="14"
-                android:padding="10dp"
-                />
+                android:padding="10dp"/>
         </FrameLayout>
     </LinearLayout>
 
@@ -178,5 +202,4 @@
             android:layout_marginHorizontal="120dp"
             android:text="Title" />
     </LinearLayout>
-
 </FrameLayout>
