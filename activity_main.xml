@@ -7,169 +7,199 @@
     android:orientation="vertical"
     android:background="#FFEE96">
 
+    <!-- Start Page -->
     <LinearLayout
+        android:id="@+id/layout_First_Page"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:id="@+id/layout_First_Page"
-        android:visibility="visible"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="제주 감귤 게임"
+            android:textSize="30sp" />
 
         <Button
             android:id="@+id/btn_Start"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="120dp"
-            android:backgroundTint="#F15F5F"
-            android:text="START" />
+            android:text="Start" />
     </LinearLayout>
 
+    <!-- In-Game Page -->
     <LinearLayout
+        android:id="@+id/layout_InGame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/layout_InGame"
         android:visibility="invisible"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
+        <!-- Timer Bar + Info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="top"
-            android:gravity="end"
+            android:orientation="vertical"
             android:background="#AAFFA3">
-            <TextView
-                android:layout_width="0dp"
+
+            <!-- 타이머바 -->
+            <LinearLayout
+                android:id="@+id/TimerBarContainer"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="#AAFFA3"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp">
+
+                <View
+                    android:id="@+id/TimerBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#FF8000"/>
+            </LinearLayout>
+
+            <!-- 타이머 텍스트 및 점수 -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="10dp"
-                android:textSize="15dp"
-                android:id="@+id/TimeDisplay"
-                />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:id="@+id/btn_InGame_Setting"
-                android:backgroundTint="#F15F5F"
-                android:text="setting"
-                >
-            </Button>
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <TextView
+                    android:id="@+id/TimeDisplay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:textSize="15sp"
+                    android:text="00:30" />
+
+                <TextView
+                    android:id="@+id/ScoreDisplay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:textSize="15sp"
+                    android:text="Score: 0" />
+
+                <Button
+                    android:id="@+id/btn_InGame_Setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:text="setting" />
+            </LinearLayout>
         </LinearLayout>
+
+        <!-- Game Field -->
         <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/inGame_play"
-            >
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
             <GridLayout
                 android:id="@+id/inGame_field"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:columnCount="7"
-                android:padding="16dp"
+                android:columnCount="6"
                 android:rowCount="14"
-                />
+                android:padding="10dp"/>
         </FrameLayout>
     </LinearLayout>
 
+    <!-- Setting Page -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
         android:id="@+id/layout_SettingPage"
-        android:visibility="invisible"
-        android:background="#99ffffff"
-        android:orientation="vertical"
-        android:clickable="true"
-        android:focusable="true">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="110dp"
-                android:textSize="30dp"
-                android:text="Volume"/>
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="120dp"
-                android:id="@+id/Mute"
-                android:text="Mute"
-                android:textSize="20dp"
-                />
-            <SeekBar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/VolumeControl"
-                android:max="100"
-                android:progress="50"
-                android:layout_marginBottom="30dp"
-                android:layout_marginHorizontal="100dp"
-                />
-        </LinearLayout>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_SettingPage_Back"
-            android:backgroundTint="#F15F5F"
-            android:layout_marginHorizontal="120dp"
-            android:text="Back"
-            />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_SettingPage_Restart"
-            android:backgroundTint="#F15F5F"
-            android:layout_marginHorizontal="120dp"
-            android:text="Restart"
-            />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_SettingPage_Title"
-            android:backgroundTint="#F15F5F"
-            android:layout_marginHorizontal="120dp"
-            android:text="Title"
-            />
-    </LinearLayout>
-
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/layout_EndPage"
-        android:visibility="invisible"
-        android:background="#99ffffff"
+        android:background="#30FFFFFF"
         android:orientation="vertical"
-        android:gravity="center"
-        android:clickable="true"
-        android:focusable="true">
+        android:padding="20dp"
+        android:visibility="invisible">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="50dp"
-            android:text="Score"/>
-        <Button
+            android:layout_marginBottom="10dp"
+            android:text="Settings"
+            android:textSize="20sp" />
+
+        <CheckBox
+            android:id="@+id/Mute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mute" />
+
+        <SeekBar
+            android:id="@+id/VolumeControl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_EndPage_Again"
-            android:backgroundTint="#F15F5F"
-            android:layout_marginHorizontal="120dp"
-            android:text="Again"
-            />
+            android:max="100" />
+
         <Button
+            android:id="@+id/btn_SettingPage_Back"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_EndPage_Title"
-            android:backgroundTint="#F15F5F"
-            android:layout_marginHorizontal="120dp"
-            android:text="Title"
-            />
+            android:layout_marginTop="10dp"
+            android:text="Back" />
+
+        <Button
+            android:id="@+id/btn_SettingPage_Restart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Restart" />
+
+        <Button
+            android:id="@+id/btn_SettingPage_Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Title" />
     </LinearLayout>
 
+    <!-- End Page -->
+    <LinearLayout
+        android:id="@+id/layout_EndPage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:background="#99ffffff"
+        android:orientation="vertical"
+        android:gravity="center">
 
+        <TextView
+            android:id="@+id/EndScoreLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Score"
+            android:textSize="50sp" />
+
+        <TextView
+            android:id="@+id/FinalScoreDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="0"
+            android:textSize="40sp" />
+
+        <Button
+            android:id="@+id/btn_EndPage_Again"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="120dp"
+            android:text="Again" />
+
+        <Button
+            android:id="@+id/btn_EndPage_Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="120dp"
+            android:text="Title" />
+    </LinearLayout>
 </FrameLayout>
