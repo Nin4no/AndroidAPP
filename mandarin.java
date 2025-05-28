@@ -1,4 +1,4 @@
-package com.example.test4;
+package com.example.mandaringame_test;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -9,6 +9,8 @@ import android.widget.LinearLayout;
 
 public class mandarin extends LinearLayout {
     public int number;
+    public boolean isHanrabong = false;  // 한라봉 여부 플래그
+
     private ImageView imageView;
 
     public mandarin(Context context, int num) {
@@ -22,13 +24,15 @@ public class mandarin extends LinearLayout {
         setLayoutParams(new ViewGroup.LayoutParams(200, 200));
 
         imageView = new ImageView(context);
-        imageView.setImageResource(getImageResIdForNumber(num));
         imageView.setLayoutParams(new LayoutParams(120, 120));
+        // 초기에는 mandarin 이미지로 세팅
+        imageView.setImageResource(getMandarinResId(num));
         addView(imageView);
     }
 
-    private int getImageResIdForNumber(int number) {
-        switch (number) {
+    /** mandarin 숫자별 기본 이미지 리소스 */
+    private int getMandarinResId(int num) {
+        switch (num) {
             case 1: return R.drawable.mandarin1;
             case 2: return R.drawable.mandarin2;
             case 3: return R.drawable.mandarin3;
@@ -40,5 +44,30 @@ public class mandarin extends LinearLayout {
             case 9: return R.drawable.mandarin9;
             default: return R.drawable.mandarin;
         }
+    }
+
+    /** 한라봉 숫자별 이미지 리소스 */
+    private int getHanrabongResId(int num) {
+        switch (num) {
+            case 1: return R.drawable.hanrabong1;
+            case 2: return R.drawable.hanrabong2;
+            case 3: return R.drawable.hanrabong3;
+            case 4: return R.drawable.hanrabong4;
+            case 5: return R.drawable.hanrabong5;
+            case 6: return R.drawable.hanrabong6;
+            case 7: return R.drawable.hanrabong7;
+            case 8: return R.drawable.hanrabong8;
+            case 9: return R.drawable.hanrabong9;
+            default: return R.drawable.hanrabong;
+        }
+    }
+
+
+    public void markAsHanrabong() {
+        isHanrabong = true;
+        // 배경색 표시
+        setBackgroundColor(Color.BLACK);
+        // 이미지 리소스 변경
+        imageView.setImageResource(getHanrabongResId(number));
     }
 }
