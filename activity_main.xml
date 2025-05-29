@@ -1,35 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFEE96">
+    android:background="#AAFFA3">
 
-    <!-- Start Page -->
     <LinearLayout
         android:id="@+id/layout_First_Page"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/title"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="invisible">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:text="제주 감귤 게임"
-            android:textSize="30sp" />
+        android:visibility="visible">
 
         <Button
             android:id="@+id/btn_Start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="120dp"
-            android:backgroundTint="#F15F5F"
+            android:backgroundTint="#1ADE2A"
+            android:fontFamily="@font/ms_light_1"
             android:text="START" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -42,33 +38,66 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#AAFFA3"
-            android:gravity="end"
-            android:orientation="horizontal">
+            android:background="#9EDDF0"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/TimeDisplay"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_weight="1"
-                android:textSize="15sp" />
+            <LinearLayout
+                android:id="@+id/TimerBarContainer"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="#9EDDF0"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/ScoreDisplay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:text="Score: 0"
-                android:textSize="15sp" />
+                <View
+                    android:id="@+id/TimerBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#FF8000" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_InGame_Setting"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:backgroundTint="#F15F5F"
-                android:text="setting" />
+                android:layout_gravity="top"
+                android:background="#9EDDF0"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/TimeDisplay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ms_light_1"
+                    android:text="00:30"
+                    android:textSize="25dp" />
+
+                <TextView
+                    android:id="@+id/ScoreDisplay"
+                    android:layout_width="150dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="5dp"
+                    android:fontFamily="@font/ms_light_1"
+                    android:text="Score: 0"
+                    android:textSize="25dp" />
+
+                <ImageButton
+                    android:id="@+id/btn_InGame_Setting"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@null"
+                    android:backgroundTint="@null"
+                    android:fontFamily="@font/ms_light_1"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/setting"
+                    android:text="setting" />
+            </LinearLayout>
         </LinearLayout>
 
         <FrameLayout
@@ -82,10 +111,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:columnCount="7"
-                android:padding="10dp"
-                android:rowCount="14" >
-
-            </GridLayout>
+                android:padding="16dp"
+                android:rowCount="14" />
         </FrameLayout>
     </LinearLayout>
 
@@ -93,12 +120,11 @@
         android:id="@+id/layout_SettingPage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#99ffffff"
+        android:background="#99FFFFFF"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
-        <!--android:padding="20dp"-->
-
+        android:padding="20dp"
+        android:visibility="invisible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -109,6 +135,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="110dp"
+                android:fontFamily="@font/ms_light_1"
                 android:text="Volume"
                 android:textSize="30dp" />
 
@@ -117,6 +144,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="120dp"
+                android:fontFamily="@font/ms_light_1"
                 android:text="Mute"
                 android:textSize="20dp" />
 
@@ -135,7 +163,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="120dp"
-            android:backgroundTint="#F15F5F"
+            android:backgroundTint="#FAA62A"
+            android:fontFamily="@font/ms_light_1"
             android:text="Back" />
 
         <Button
@@ -143,7 +172,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="120dp"
-            android:backgroundTint="#F15F5F"
+            android:backgroundTint="#FAA62A"
+            android:fontFamily="@font/ms_light_1"
             android:text="Restart" />
 
         <Button
@@ -151,7 +181,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="120dp"
-            android:backgroundTint="#F15F5F"
+            android:backgroundTint="#FAA62A"
+            android:fontFamily="@font/ms_light_1"
             android:text="Title" />
     </LinearLayout>
 
@@ -159,45 +190,44 @@
         android:id="@+id/layout_EndPage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"
         android:background="#99ffffff"
+        android:gravity="center"
         android:orientation="vertical"
-        android:gravity="center">
+        android:visibility="invisible">
 
         <TextView
             android:id="@+id/EndScoreLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/ms_light_1"
             android:text="Score"
-            android:textSize="50sp"
-            />
+            android:textSize="50dp" />
 
         <TextView
             android:id="@+id/FinalScoreDisplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="20dp"
+            android:fontFamily="@font/ms_light_1"
             android:text="0"
-            android:textSize="40dp"
-            />
+            android:textSize="50dp" />
 
         <Button
             android:id="@+id/btn_EndPage_Again"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="#F15F5F"
             android:layout_marginHorizontal="120dp"
-            android:text="Again"
-            />
+            android:backgroundTint="#FAA62A"
+            android:fontFamily="@font/ms_light_1"
+            android:text="Again" />
 
         <Button
             android:id="@+id/btn_EndPage_Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="#F15F5F"
             android:layout_marginHorizontal="120dp"
-            android:text="Title"
-            />
+            android:backgroundTint="#FAA62A"
+            android:fontFamily="@font/ms_light_1"
+            android:text="Title" />
     </LinearLayout>
-
 </FrameLayout>
