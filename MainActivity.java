@@ -1,14 +1,18 @@
-package com.example.test_score;
+package com.example.mandaringame;
 
+import android.animation.ValueAnimator;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Pair;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -21,15 +25,17 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-
+    
     LinearLayout start_layout, inGame_layout, setting_layout, end_layout;
     FrameLayout inGame_play_layout;
     private MediaPlayer mp1;
-    private boolean isMuted = false;
+    //private boolean isMuted = false;
 
     CountDownTimer countDownTimer;
     private boolean timerRunning = false;
@@ -40,12 +46,15 @@ public class MainActivity extends AppCompatActivity {
     MyPointView myPointView;
     GridLayout game_field;
     static boolean Gaming = false;
-
-    List<Pair<mandarin, View>> mandarinViews = new ArrayList<>();
-
     private int currentScore = 0;
     private TextView scoreDisplay;
-    private TextView finalScoreDisplay; // EndPage의 점수 표시 TextView
+    private TextView finalScoreDisplay;
+
+    private View timerBar;
+    private int maxTimerDuration = 120000;
+    private ValueAnimator barAnim;
+
+    List<Pair<mandarin, View>> mandarinViews = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         //기능버튼
         Button btn_start = findViewById(R.id.btn_Start);
-        Button btn_ingame_setting = findViewById(R.id.btn_InGame_Setting);
+        ImageButton btn_ingame_setting = findViewById(R.id.btn_InGame_Setting);
         Button btn_settingpage_back = findViewById(R.id.btn_SettingPage_Back);
         Button btn_settingpage_title = findViewById(R.id.btn_SettingPage_Title);
         Button btn_endpage_again = findViewById(R.id.btn_EndPage_Again);
@@ -73,22 +82,24 @@ public class MainActivity extends AppCompatActivity {
         inGame_play_layout = findViewById(R.id.inGame_play);
         setting_layout = findViewById(R.id.layout_SettingPage);
         end_layout = findViewById(R.id.layout_EndPage);
+        timerBar = findViewById(R.id.TimerBar);
+        scoreDisplay = findViewById(R.id.ScoreDisplay);
+        finalScoreDisplay = findViewById(R.id.FinalScoreDisplay);
 
         //배경음악
         CheckBox chk1 = findViewById(R.id.Mute);
         SeekBar volumebar = findViewById(R.id.VolumeControl);
         mp1 = MediaPlayer.create(this, R.raw.stikato);
 
-        // 점수 TextView
-        scoreDisplay = findViewById(R.id.ScoreDisplay);
-        finalScoreDisplay = findViewById(R.id.FinalScoreDisplay);
-
         //기본 화면으로
         change_layout(5);
 
-        //인게임 객체 초기화 및 생성
+        //인게임 객체
         game_field = findViewById(R.id.inGame_field);
-        initializeGameField(); // 게임 필드 초기화 함수 호출
+        game_field.setColumnCount(7); // 컬럼 수 명시적으로 설정
+
+        // initializeGameField는 게임 시작 시에만 호출
+        // initializeGameField(); // onCreate에서는 게임 시작 전에 호출 안 함
 
         myPointView = new MyPointView(this, game_field, mandarinViews);
         FrameLayout.LayoutParams overlayParams = new FrameLayout.LayoutParams(
@@ -111,10 +122,10 @@ public class MainActivity extends AppCompatActivity {
         btn_start.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "게임을 시작합니다.", Toast.LENGTH_SHORT).show();
             change_layout(0);
-            restartGame();
+            restartGame(); // 게임 재시작 (필드 초기화, 점수 초기화, 타이머 시작)
         });
 
-            btn_ingame_setting.setOnClickListener(v -> {
+        btn_ingame_setting.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "설정으로 이동합니다.", Toast.LENGTH_SHORT).show();
             change_layout(1);
             pauseTimer();
@@ -136,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         btn_endpage_again.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "게임을 재시작합니다.", Toast.LENGTH_SHORT).show();
             change_layout(4);
-            restartGame(); // 게임 재시작 함수 호출
+            restartGame();
         });
         btn_endpage_title.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "타이틀로 이동합니다.", Toast.LENGTH_SHORT).show();
@@ -147,8 +158,10 @@ public class MainActivity extends AppCompatActivity {
         chk1.setOnClickListener(v -> {
             if (chk1.isChecked()) {
                 volumebar.setProgress(0);
+                //isMuted = true;
             } else {
                 volumebar.setProgress(50);
+               // isMuted = false;
             }
         });
         //볼륨바
@@ -173,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // 백그라운드로 넘어갔을때
+    //백그라운드로 넘어갔을때
     @Override
     protected void onPause() {
         super.onPause();
@@ -183,20 +196,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // 메인으로 돌아올때
+    //메인으로 돌아올때
     @Override
     protected void onResume() {
         super.onResume();
-        if (!timerRunning && !isFirstResume) {
+        if (!timerRunning && !isFirstResume && Gaming){
             resumeTimer();
         }
-        if (mp1 != null && !mp1.isPlaying() && !isMuted) {
+        if (mp1 != null && !mp1.isPlaying()) {
             mp1.start();
         }
         isFirstResume = false;
     }
 
-    // 화면 바꿀때
+    //화면 바꿀때
     public void change_layout(int i) {
         int Layout_Index = i;
 
@@ -216,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
             Gaming = false;
         } else if (Layout_Index == 4) {
             end_layout.setVisibility(View.INVISIBLE);
-            inGame_layout.setVisibility(View.VISIBLE);
             Gaming = true;
         } else if (Layout_Index == 5) {
             end_layout.setVisibility(View.INVISIBLE);
@@ -228,40 +240,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // 타이머
+    //타이머
     public void startTimer() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
+        if (countDownTimer != null) countDownTimer.cancel();
+        if (barAnim != null) barAnim.cancel();
 
-        //테스트 하면서 하느랴 30초로 우선 바꿔 놓음
-        countDownTimer = new CountDownTimer(30000, 1000) {
-            public void onTick(long millisUntilFinished) {
-                timeLeftInMillis = millisUntilFinished;
-                int min = (int) (millisUntilFinished / 60000);
-                int sec = (int) ((millisUntilFinished % 60000) / 1000);
-                String time = String.format("%d:%02d", min, sec);
-                Timer.setText(time);
-            }
+        int fullWidth = getResources().getDisplayMetrics().widthPixels;
+        barAnim = ValueAnimator.ofInt(fullWidth, 0);
+        barAnim.setDuration(maxTimerDuration);
+        barAnim.setInterpolator(new LinearInterpolator());
+        barAnim.addUpdateListener(animation -> {
+            int width = (int) animation.getAnimatedValue();
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, LinearLayout.LayoutParams.MATCH_PARENT);
+            timerBar.setLayoutParams(params);
+        });
+        barAnim.start();
 
-            public void onFinish() {
-                timerRunning = false;
-                change_layout(3);
-            }
-        }.start();
-        timerRunning = true;
-    }
-
-    public void pauseTimer() {
-        if (timerRunning) {
-            countDownTimer.cancel();
-            timerRunning = false;
-        }
-    }
-
-    public void resumeTimer() {
-        if (!timerRunning) {
-            countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+        timeLeftInMillis = maxTimerDuration;
+        countDownTimer = new CountDownTimer(maxTimerDuration, 1000) {
                 public void onTick(long millisUntilFinished) {
                     timeLeftInMillis = millisUntilFinished;
                     int min = (int) (millisUntilFinished / 60000);
@@ -277,46 +273,184 @@ public class MainActivity extends AppCompatActivity {
             }.start();
             timerRunning = true;
         }
-    }
 
-    // 게임 필드 초기화 및 재시작
-    private void initializeGameField() {
-        game_field.removeAllViews(); // 기존 귤 제거
-        mandarinViews.clear(); // 리스트 초기화
-
-        Random random = new Random();
-        for (int i = 0; i < 98; i++) {
-            int num = random.nextInt(9) + 1;
-            mandarin block = new mandarin(this, num);
-
-            int row = i / 7;
-            int col = i % 7;
-            GridLayout.Spec rowSpec = GridLayout.spec(row, 1);
-            GridLayout.Spec colSpec = GridLayout.spec(col, 1);
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
-            params.width = 150;
-            params.height = 150;
-            params.setMargins(10, 10, 10, 10);
-
-            game_field.addView(block, params);
-            mandarinViews.add(new Pair<>(block, block));
+        public void pauseTimer() {
+            if (timerRunning) {
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                }
+                if (barAnim != null && barAnim.isRunning()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        barAnim.pause();
+                    } else {
+                        barAnim.cancel();
+                    }
+                }
+                timerRunning = false;
+            }
         }
-        if (myPointView != null) {
-            myPointView.updateMandarinViews(mandarinViews); // MyPointView 갱신
+
+        public void resumeTimer() {
+            if (!timerRunning) {
+                countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+                    public void onTick(long millisUntilFinished) {
+                        timeLeftInMillis = millisUntilFinished;
+                        int min = (int) (millisUntilFinished / 60000);
+                        int sec = (int) ((millisUntilFinished % 60000) / 1000);
+                        String time = String.format("%d:%02d", min, sec);
+                        Timer.setText(time);
+                    }
+
+                    public void onFinish() {
+                        timerRunning = false;
+                        change_layout(3);
+                    }
+                }.start();
+                if (barAnim != null) {
+                    int currentWidth = timerBar.getLayoutParams().width;
+                    barAnim.cancel();
+                    barAnim = ValueAnimator.ofInt(currentWidth, 0);
+                    barAnim.setDuration(timeLeftInMillis);
+                    barAnim.setInterpolator(new LinearInterpolator());
+                    barAnim.addUpdateListener(anim -> {
+                        int w = (int) anim.getAnimatedValue();
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                                w, LinearLayout.LayoutParams.MATCH_PARENT
+                        );
+                        timerBar.setLayoutParams(lp);
+                    });
+                    barAnim.start();
+                }
+                timerRunning = true;
+            }
         }
-    }
 
-    public void updateScore(int scoreToAdd) {
-        currentScore += scoreToAdd;
-        scoreDisplay.setText("Score: " + currentScore);
-        finalScoreDisplay.setText(String.valueOf(currentScore)); // EndPage 점수도 업데이트
-    }
 
-    // 게임 재시작 시 점수 초기화
-    public void restartGame() {
-        initializeGameField();
-        currentScore = 0;
-        updateScore(0);
-        startTimer();
-    }
+        public void extendTimer(long timeToAddMillis) {
+            if (timerRunning) {
+                pauseTimer();
+                timeLeftInMillis += timeToAddMillis;
+
+                int min = (int) (timeLeftInMillis / 60000);
+                int sec = (int) ((timeLeftInMillis % 60000) / 1000);
+                String time = String.format("%d:%02d", min, sec);
+                Timer.setText(time);
+
+               // int fullWidth = getResources().getDisplayMetrics().widthPixels;
+
+                int currentTimerBarWidth = timerBar.getWidth();
+                long newDurationForAnim = timeLeftInMillis;
+
+                if (barAnim != null) barAnim.cancel();
+
+                barAnim = ValueAnimator.ofInt(currentTimerBarWidth, 0);
+                barAnim.setDuration(newDurationForAnim);
+                barAnim.setInterpolator(new LinearInterpolator());
+                barAnim.addUpdateListener(animation -> {
+                    int width = (int) animation.getAnimatedValue();
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, LinearLayout.LayoutParams.MATCH_PARENT);
+                    timerBar.setLayoutParams(params);
+                });
+                barAnim.start();
+
+                resumeTimer();
+            } else {
+
+                timeLeftInMillis += timeToAddMillis;
+                int min = (int) (timeLeftInMillis / 60000);
+                int sec = (int) ((timeLeftInMillis % 60000) / 1000);
+                String time = String.format("%d:%02d", min, sec);
+                Timer.setText(time);
+            }
+        }
+
+
+        public void initializeGameField() {
+            game_field.removeAllViews();
+            mandarinViews.clear();
+
+            Random random = new Random();
+
+            int hanrabongCount = random.nextInt(4) + 7;
+            Set<Integer> hanrabongIndices = new HashSet<>();
+            while (hanrabongIndices.size() < hanrabongCount) {
+                hanrabongIndices.add(random.nextInt(98));
+            }
+
+
+            int dolhareubangCount = 3;
+            Set<Integer> dolhareubangIndices = new HashSet<>();
+            while (dolhareubangIndices.size() < dolhareubangCount) {
+                int newIndex = random.nextInt(98);
+                if (!hanrabongIndices.contains(newIndex) && !dolhareubangIndices.contains(newIndex)) { // 한라봉 및 다른 돌하르방과 겹치지 않게
+                    dolhareubangIndices.add(newIndex);
+                }
+            }
+
+            for (int i = 0; i < 98; i++) {
+                int num;
+                mandarin block;
+
+                if (dolhareubangIndices.contains(i)) {
+                    num = 0;
+                    block = new mandarin(this, num);
+                    block.markAsDolhareubang();
+                } else {
+                    num = random.nextInt(9) + 1;
+                    block = new mandarin(this, num);
+                    if (hanrabongIndices.contains(i)) {
+                        block.markAsHanrabong();
+                    }
+                }
+
+                int row = i / 7;
+                int col = i % 7;
+                GridLayout.Spec rowSpec = GridLayout.spec(row, 1);
+                GridLayout.Spec colSpec = GridLayout.spec(col, 1);
+                GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
+                params.width = 150;
+                params.height = 150;
+                params.setMargins(10, 10, 10, 10);
+
+                game_field.addView(block, params);
+                mandarinViews.add(new Pair<>(block, block));
+            }
+            if (myPointView != null) {
+                myPointView.updateMandarinViews(mandarinViews);
+            }
+        }
+
+        public void updateScore(int scoreToAdd) {
+            currentScore += scoreToAdd;
+            scoreDisplay.setText("Score: " + currentScore);
+            finalScoreDisplay.setText(String.valueOf(currentScore));
+        }
+
+        public void restartGame() {
+            initializeGameField();
+            currentScore = 0;
+            updateScore(0);
+            startTimer();
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+            );
+            timerBar.setLayoutParams(params);
+        }
+
+        @Override
+        protected void onDestroy() {
+            super.onDestroy();
+            if (mp1 != null) {
+                mp1.release();
+                mp1 = null;
+            }
+            if (countDownTimer != null) {
+                countDownTimer.cancel();
+            }
+            if (barAnim != null) {
+                barAnim.cancel();
+            }
+        }
 }
