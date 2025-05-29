@@ -1,4 +1,4 @@
-package com.example.test4;
+package com.example.mandaringame_test;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -12,6 +12,7 @@ import android.widget.GridLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MyPointView extends View {
     private Paint paint;
@@ -58,6 +59,9 @@ public class MyPointView extends View {
                     );
                     int sum = 0;
                     List<Integer> toRemoveIndices = new ArrayList<>();
+                    int hanrabongRemovedCount = 0;
+                    boolean dolhareubangInDrag = false;
+
                     for (int i = 0; i < mandarinViews.size(); i++) {
                         Pair<mandarin, View> pair = mandarinViews.get(i);
                         View v = pair.second;
@@ -67,17 +71,49 @@ public class MyPointView extends View {
                                 (int) (v.getY() + v.getHeight())
                         );
                         if (Rect.intersects(dragRect, mRect)) {
-                            sum += pair.first.number;
-                            toRemoveIndices.add(i);
+                            if (pair.first.isDolhareubang) {
+                                dolhareubangInDrag = true;
+                                toRemoveIndices.add(i);
+                            } else {
+                                sum += pair.first.number;
+                                toRemoveIndices.add(i);
+                                if (pair.first.isHanrabong) {
+                                    hanrabongRemovedCount++;
+                                }
+                            }
                         }
                     }
+
                     if (sum == 10) {
                         toRemoveIndices.sort((a, b) -> b - a);
                         for (int index : toRemoveIndices) {
                             gameField.removeView(mandarinViews.get(index).second);
                             mandarinViews.remove(index);
                         }
-                        mainActivity.updateScore(toRemoveIndices.size());
+
+                        if (dolhareubangInDrag) {
+                            List<Integer> removableMandarinIndices = new ArrayList<>();
+                            for (int i = 0; i < mandarinViews.size(); i++) {
+                                if (!mandarinViews.get(i).first.isDolhareubang) {
+                                    removableMandarinIndices.add(i);
+                                }
+                            }
+
+                            if (!removableMandarinIndices.isEmpty()) {
+                                Random random = new Random();
+                                int randomIndex = random.nextInt(removableMandarinIndices.size());
+                                int indexToRemove = removableMandarinIndices.get(randomIndex);
+
+                                gameField.removeView(mandarinViews.get(indexToRemove).second);
+                                mandarinViews.remove(indexToRemove);
+                            }
+                        }
+
+                        int scoreToAdd = toRemoveIndices.size() + (hanrabongRemovedCount * 5);
+                        mainActivity.updateScore(scoreToAdd);
+
+                        long timeExtension = (long) (scoreToAdd * 0.5 * 1000);
+                        mainActivity.extendTimer(timeExtension);
                     }
                 }
                 startX = startY = stopX = stopY = -1;
