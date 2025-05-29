@@ -1,4 +1,4 @@
-package com.example.mandaringame_test;
+package com.example.mandaringame;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -12,7 +12,6 @@ import android.widget.GridLayout;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MyPointView extends View {
     private Paint paint;
@@ -20,13 +19,10 @@ public class MyPointView extends View {
     private GridLayout gameField;
     private List<Pair<mandarin, View>> mandarinViews;
 
-    private MainActivity mainActivity;
-
     public MyPointView(Context context, GridLayout gameField, List<Pair<mandarin, View>> mandarinViews) {
         super(context);
         this.gameField = gameField;
         this.mandarinViews = mandarinViews;
-        this.mainActivity = (MainActivity) context;
         paint = new Paint();
         paint.setAntiAlias(true);
         paint.setStrokeWidth(5);
@@ -58,12 +54,8 @@ public class MyPointView extends View {
                             Math.max(startX, stopX), Math.max(startY, stopY)
                     );
                     int sum = 0;
-                    List<Integer> toRemoveIndices = new ArrayList<>();
-                    int hanrabongRemovedCount = 0;
-                    boolean dolhareubangInDrag = false;
-
-                    for (int i = 0; i < mandarinViews.size(); i++) {
-                        Pair<mandarin, View> pair = mandarinViews.get(i);
+                    List<Pair<mandarin, View>> toRemove = new ArrayList<>();
+                    for (Pair<mandarin, View> pair : mandarinViews) {
                         View v = pair.second;
                         Rect mRect = new Rect(
                                 (int) v.getX(), (int) v.getY(),
@@ -71,49 +63,15 @@ public class MyPointView extends View {
                                 (int) (v.getY() + v.getHeight())
                         );
                         if (Rect.intersects(dragRect, mRect)) {
-                            if (pair.first.isDolhareubang) {
-                                dolhareubangInDrag = true;
-                                toRemoveIndices.add(i);
-                            } else {
-                                sum += pair.first.number;
-                                toRemoveIndices.add(i);
-                                if (pair.first.isHanrabong) {
-                                    hanrabongRemovedCount++;
-                                }
-                            }
+                            sum += pair.first.number;
+                            toRemove.add(pair);
                         }
                     }
-
                     if (sum == 10) {
-                        toRemoveIndices.sort((a, b) -> b - a);
-                        for (int index : toRemoveIndices) {
-                            gameField.removeView(mandarinViews.get(index).second);
-                            mandarinViews.remove(index);
+                        for (Pair<mandarin, View> pairToRemove : toRemove) {
+                            gameField.removeView(pairToRemove.second);
+                            mandarinViews.remove(pairToRemove);
                         }
-
-                        if (dolhareubangInDrag) {
-                            List<Integer> removableMandarinIndices = new ArrayList<>();
-                            for (int i = 0; i < mandarinViews.size(); i++) {
-                                if (!mandarinViews.get(i).first.isDolhareubang) {
-                                    removableMandarinIndices.add(i);
-                                }
-                            }
-
-                            if (!removableMandarinIndices.isEmpty()) {
-                                Random random = new Random();
-                                int randomIndex = random.nextInt(removableMandarinIndices.size());
-                                int indexToRemove = removableMandarinIndices.get(randomIndex);
-
-                                gameField.removeView(mandarinViews.get(indexToRemove).second);
-                                mandarinViews.remove(indexToRemove);
-                            }
-                        }
-
-                        int scoreToAdd = toRemoveIndices.size() + (hanrabongRemovedCount * 5);
-                        mainActivity.updateScore(scoreToAdd);
-
-                        long timeExtension = (long) (scoreToAdd * 0.5 * 1000);
-                        mainActivity.extendTimer(timeExtension);
                     }
                 }
                 startX = startY = stopX = stopY = -1;
@@ -133,9 +91,5 @@ public class MyPointView extends View {
                     paint
             );
         }
-    }
-
-    public void updateMandarinViews(List<Pair<mandarin, View>> newMandarinViews) {
-        this.mandarinViews = newMandarinViews;
     }
 }
