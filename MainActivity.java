@@ -96,10 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         //인게임 객체
         game_field = findViewById(R.id.inGame_field);
-        game_field.setColumnCount(7); // 컬럼 수 명시적으로 설정
-
-        // initializeGameField는 게임 시작 시에만 호출
-        // initializeGameField(); // onCreate에서는 게임 시작 전에 호출 안 함
+        game_field.setColumnCount(7); 
 
         myPointView = new MyPointView(this, game_field, mandarinViews);
         FrameLayout.LayoutParams overlayParams = new FrameLayout.LayoutParams(
@@ -122,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         btn_start.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "게임을 시작합니다.", Toast.LENGTH_SHORT).show();
             change_layout(0);
-            restartGame(); // 게임 재시작 (필드 초기화, 점수 초기화, 타이머 시작)
+            restartGame(); 
         });
 
         btn_ingame_setting.setOnClickListener(v -> {
@@ -382,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
             Set<Integer> dolhareubangIndices = new HashSet<>();
             while (dolhareubangIndices.size() < dolhareubangCount) {
                 int newIndex = random.nextInt(98);
-                if (!hanrabongIndices.contains(newIndex) && !dolhareubangIndices.contains(newIndex)) { // 한라봉 및 다른 돌하르방과 겹치지 않게
+                if (!hanrabongIndices.contains(newIndex) && !dolhareubangIndices.contains(newIndex)) {
                     dolhareubangIndices.add(newIndex);
                 }
             }
